@@ -1,10 +1,10 @@
 'use strict'
 
-const express = require('express');
-const app = express();
-const server = require('http').createServer(app);
+const server = require('http').createServer(require('express')());
 const io = require('socket.io')(server);
-app.set('port', process.env.PORT || 3000);
+const mongoose = require('mongoose');
+
+const playerModel = require('./player');
 
 io.on('connection', function(socket) {
     socket.on('Join', function(data) {
@@ -37,6 +37,14 @@ io.on('connection', function(socket) {
     });
 });
 
-server.listen(app.get('port'), function () {
+mongoose.connect('mongodb://localhost/oiraga', function(err) {
+    if (err) {
+        console.log('Can not connect to DB');
+        return;
+    }
+    console.log('Successfully connected to DB');
+});
+
+server.listen(process.env.PORT || 3000, function() {
     console.log('Server is running...');
 });
